@@ -1878,6 +1878,28 @@ nng_mqttv5_quic_client_open_conf(nng_socket *sock, const char *url, conf_quic *c
 	return rv;
 }
 
+/**
+ * get handle to qsock
+*/
+int
+nng_mqttv5_quic_client_get_connection(nng_socket *sock, void ** qsock)
+{
+	int       rv = 0;
+	nni_sock *nsock = NULL;
+	mqtt_sock_t *msock = NULL;
+
+	nni_sock_find(&nsock, sock->id);
+	if (nsock) {
+		msock = nni_sock_proto_data(nsock);
+		*qsock = msock->qsock;
+	} else {
+		rv = -1;
+	}
+	nni_sock_rele(nsock);
+	return rv;
+}
+
+
 static int
 nng_mqtt_quic_set_config(nng_socket *sock, void *node)
 {

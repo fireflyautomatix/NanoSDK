@@ -52,6 +52,7 @@ void conf_quic_tls_create(conf_quic **cqp, char *cafile, char *certfile,
 NNG_DECL int nng_mqttv5_quic_client_open(nng_socket *, const char *url);
 NNG_DECL int nng_mqttv5_quic_client_open_conf(
     nng_socket *sock, const char *url, conf_quic *conf);
+NNG_DECL int nng_mqttv5_quic_client_get_connection(nng_socket *sock, void ** qsock);
 NNG_DECL int nng_mqtt_quic_client_open(nng_socket *, const char *url);
 NNG_DECL int nng_mqtt_quic_client_open_conf(
     nng_socket *sock, const char *url, conf_quic *conf);

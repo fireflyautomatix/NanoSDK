@@ -717,12 +717,12 @@ quic_connection_cb(_In_ HQUIC Connection, _In_opt_ void *Context,
 		 * Does MsQuic ensure the connected event will happen after
 		 * peer_certificate_received event.?
 		 */
-		if (QUIC_FAILED(rv = verify_peer_cert_tls(
-				Event->PEER_CERTIFICATE_RECEIVED.Certificate,
-				Event->PEER_CERTIFICATE_RECEIVED.Chain, qsock->cacert))) {
-			log_error("[conn][%p] Invalid certificate file received from the peer");
-			return rv;
-		}
+		// if (QUIC_FAILED(rv = verify_peer_cert_tls(
+		// 		Event->PEER_CERTIFICATE_RECEIVED.Certificate,
+		// 		Event->PEER_CERTIFICATE_RECEIVED.Chain, qsock->cacert))) {
+		// 	log_error("[conn][%p] Invalid certificate file received from the peer");
+		// 	return rv;
+		// }
 		break;
 	case QUIC_CONNECTION_EVENT_DATAGRAM_STATE_CHANGED:
 		log_info("QUIC_CONNECTION_EVENT_DATAGRAM_STATE_CHANGED");
@@ -769,6 +769,8 @@ quic_disconnect(void *qsock, void *qpipe)
 	return 0;
 }
 
+QUIC_TLS_SECRETS g_tls_secrets;
+
 int
 quic_connect_ipv4(const char *url, nni_sock *sock, uint32_t *index, void **qsockp)
 {
@@ -798,6 +800,20 @@ quic_connect_ipv4(const char *url, nni_sock *sock, uint32_t *index, void **qsock
 		log_error("Failed in Quic ConnectionOpen, 0x%x!", rv);
 		goto error;
 	}
+
+#ifdef SSLKEYLOGFILE
+	if (getenv("SSLKEYLOGFILE") != NULL) {
+		QUIC_STATUS Status =
+		MsQuic->SetParam(
+				conn,
+				QUIC_PARAM_CONN_TLS_SECRETS,
+				sizeof(QUIC_TLS_SECRETS),
+				(uint8_t*)&g_tls_secrets);
+		if (QUIC_FAILED(Status)) {
+			log_error("Failed to setup TLS secrets logging, 0x%x!", Status);
+		}
+	}
+#endif
 
 	// TODO: Windows compatible
 	QUIC_ADDR Address = { 0 };

@@ -39,7 +39,8 @@ if(OPENSSL_FOUND)
 endif()
 
 target_link_libraries(quic_client_v5 nng msquic pthread)
-target_compile_definitions(quic_client_v5 PRIVATE NNG_ELIDE_DEPRECATED)
+target_compile_definitions(nng PRIVATE SSLKEYLOGFILE)
+target_compile_definitions(quic_client_v5 PRIVATE NNG_ELIDE_DEPRECATED CX_PLATFORM_LINUX)
 
 if (NNG_ENABLE_SQLITE)
     add_definitions(-DNNG_SUPP_SQLITE)
